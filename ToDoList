@@ -1,0 +1,74 @@
+import json
+from datetime import datetime
+
+class TodoList:
+    def __init__(self):
+        self.tasks = []
+
+    def display_tasks(self):
+        if not self.tasks:
+            print("No tasks found.")
+        else:
+            for i, task in enumerate(self.tasks, start=1):
+                print(f"{i}. {task['title']} - {task['due_date']}")
+
+    def add_task(self, title, due_date):
+        task = {'title': title, 'due_date': due_date, 'status': 'Incomplete'}
+        self.tasks.append(task)
+        print(f"Task '{title}' added successfully.")
+
+    def update_task_status(self, task_index, status):
+        if 1 <= task_index <= len(self.tasks):
+            self.tasks[task_index - 1]['status'] = status
+            print(f"Task status updated successfully.")
+        else:
+            print("Invalid task index.")
+
+    def save_to_file(self, file_path='todo_list.json'):
+        with open(file_path, 'w') as file:
+            json.dump(self.tasks, file)
+        print("To-Do List saved to file.")
+
+    def load_from_file(self, file_path='todo_list.json'):
+        try:
+            with open(file_path, 'r') as file:
+                self.tasks = json.load(file)
+            print("To-Do List loaded from file.")
+        except FileNotFoundError:
+            print("No saved To-Do List found.")
+
+if __name__ == "__main__":
+    todo_list = TodoList()
+
+    while True:
+        print("\n===== To-Do List Application =====")
+        print("0. Exit")
+        print("1. Display Tasks")
+        print("2. Add Task")
+        print("3. Update Task Status")
+        print("4. Save To-Do List to File")
+        print("5. Load To-Do List from File")
+        
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            todo_list.display_tasks()
+        elif choice == "2":
+            title = input("Enter task title: ")
+            due_date = input("Enter due date (YYYY-MM-DD): ")
+            todo_list.add_task(title, due_date)
+        elif choice == "3":
+            todo_list.display_tasks()
+            task_index = int(input("Enter the task index to update status: "))
+            status = input("Enter task status (Complete/Incomplete): ").capitalize()
+            todo_list.update_task_status(task_index, status)
+        elif choice == "4":
+            todo_list.save_to_file()
+        elif choice == "5":
+            todo_list.load_from_file()
+        elif choice == "0":
+            print("Exiting To-Do List Application. Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please enter a valid option.")
