@@ -1,0 +1,101 @@
+import json
+
+class ContactManager:
+    def __init__(self):
+        self.contacts = []
+
+    def load_contacts(self, file_path='contacts.json'):
+        try:
+            with open(file_path, 'r') as file:
+                self.contacts = json.load(file)
+        except FileNotFoundError:
+            pass  # No saved contacts file found
+
+    def save_contacts(self, file_path='contacts.json'):
+        with open(file_path, 'w') as file:
+            json.dump(self.contacts, file)
+
+    def add_contact(self, name, phone, email, address):
+        contact = {'name': name, 'phone': phone, 'email': email, 'address': address}
+        self.contacts.append(contact)
+        print(f"Contact '{name}' added successfully.")
+
+    def view_contacts(self):
+        if not self.contacts:
+            print("No contacts found.")
+        else:
+            for i, contact in enumerate(self.contacts, start=1):
+                print(f"{i}. {contact['name']} - {contact['phone']}")
+
+    def search_contact(self, search_term):
+        results = []
+        for contact in self.contacts:
+            if search_term.lower() in contact['name'].lower() or search_term in contact['phone']:
+                results.append(contact)
+        return results
+
+    def update_contact(self, contact_index, field, new_value):
+        if 1 <= contact_index <= len(self.contacts):
+            self.contacts[contact_index - 1][field] = new_value
+            print("Contact updated successfully.")
+        else:
+            print("Invalid contact index.")
+
+    def delete_contact(self, contact_index):
+        if 1 <= contact_index <= len(self.contacts):
+            deleted_contact = self.contacts.pop(contact_index - 1)
+            print(f"Contact '{deleted_contact['name']}' deleted successfully.")
+        else:
+            print("Invalid contact index.")
+
+def display_menu():
+    print("\n===== Contact Management System =====")
+    print("0. Exit")
+    print("1. Add Contact")
+    print("2. View Contact List")
+    print("3. Search Contact")
+    print("4. Update Contact")
+    print("5. Delete Contact")
+    
+
+if __name__ == "__main__":
+    contact_manager = ContactManager()
+    contact_manager.load_contacts()
+
+    while True:
+        display_menu()
+        choice = input("Enter your choice (0-5): ")
+
+        if choice == "0":
+            contact_manager.save_contacts()
+            print("Exiting Contact Management System. Goodbye!")
+            break
+        elif choice == "1":
+            name = input("Enter contact name: ")
+            phone = input("Enter contact phone number: ")
+            email = input("Enter contact email: ")
+            address = input("Enter contact address: ")
+            contact_manager.add_contact(name, phone, email, address)
+        elif choice == "2":
+            contact_manager.view_contacts()
+        elif choice == "3":
+            search_term = input("Enter search term (name or phone number): ")
+            search_results = contact_manager.search_contact(search_term)
+            if search_results:
+                print("\nSearch Results:")
+                for i, result in enumerate(search_results, start=1):
+                    print(f"{i}. {result['name']} - {result['phone']}")
+            else:
+                print("No matching contacts found.")
+        elif choice == "4":
+            contact_manager.view_contacts()
+            contact_index = int(input("Enter the index of the contact to update: "))
+            field = input("Enter the field to update (name, phone, email, address): ")
+            new_value = input("Enter the new value: ")
+            contact_manager.update_contact(contact_index, field, new_value)
+        elif choice == "5":
+            contact_manager.view_contacts()
+            contact_index = int(input("Enter the index of the contact to delete: "))
+            contact_manager.delete_contact(contact_index)
+        else:
+            print("Invalid choice. Please enter a valid option.")
